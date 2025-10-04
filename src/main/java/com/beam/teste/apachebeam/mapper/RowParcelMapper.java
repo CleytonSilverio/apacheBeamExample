@@ -11,8 +11,8 @@ import org.mapstruct.factory.Mappers;
 
 import com.beam.teste.apachebeam.model.Parcel;
 
-@Mapper(componentModel = "default")
-public abstract class RowParcelMapper {
+@Mapper
+public interface RowParcelMapper {
     public static final RowParcelMapper INSTANCE = Mappers.getMapper(RowParcelMapper.class);
 
     @Mapping(target = "id", expression = "java(getInt(row, \"id\"))")
@@ -21,21 +21,28 @@ public abstract class RowParcelMapper {
     @Mapping(target = "dueDate", expression = "java(getLocalDate(row, \"due_date\"))")
     public abstract Parcel rowToParcel(Row row);
 
-    public int getInt(Row row, String field) {
+    default Parcel logRowToParcel(Row row) {
+        Parcel parcel = rowToParcel(row);
+        System.out.println("[RowParcelMapper] Row: " + row);
+        System.out.println("[RowParcelMapper] Parcel criado: " + parcel);
+        return parcel;
+    }
+
+    default int getInt(Row row, String field) {
         Object value = row.getBaseValue(field, Object.class);
         if (value instanceof Integer) return (Integer) value;
         if (value instanceof Number) return ((Number) value).intValue();
         return 0;
     }
 
-    public BigDecimal getBigDecimal(Row row, String field) {
+    default BigDecimal getBigDecimal(Row row, String field) {
         Object value = row.getBaseValue(field, Object.class);
         if (value instanceof BigDecimal) return (BigDecimal) value;
         if (value instanceof Number) return BigDecimal.valueOf(((Number) value).doubleValue());
         return null;
     }
 
-    public LocalDate getLocalDate(Row row, String field) {
+    default LocalDate getLocalDate(Row row, String field) {
         Object value = row.getBaseValue(field, Object.class);
         if (value instanceof LocalDate) return (LocalDate) value;
         if (value instanceof java.sql.Date) return ((java.sql.Date) value).toLocalDate();

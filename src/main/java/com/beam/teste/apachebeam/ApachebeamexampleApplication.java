@@ -25,13 +25,6 @@ public class ApachebeamexampleApplication {
 
 		// 1) Lê parcelas
 		PCollection<Parcel> openParcels = repo.findOpenParcels(pipeline);
-
-		// 2) Debug
-		openParcels.apply("Debug Parcels", MapElements.into(TypeDescriptors.strings()).via(p -> {
-			System.out.println(p);
-			return p.toString();
-		}));
-
 		// 3) Aplica cálculo 1
 		PCollection<Parcel> recalculated1 = applyCalculo(openParcels);
 

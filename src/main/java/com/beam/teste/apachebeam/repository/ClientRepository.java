@@ -23,26 +23,32 @@ public class ClientRepository extends BeamJdbcRepository<Parcel> {
 	public PCollection<Parcel> findOpenParcels(Pipeline pipeline) {
 		String query = "SELECT * FROM parcel";
 
-		PCollection<Row> rows = pipeline.apply("Read Open Parcels",
-			JdbcIO.readRows()
-				.withDataSourceConfiguration(config)
-				.withQuery(query)
-		);
+		return pipeline
+				.apply("Read Open Parcels", JdbcIO.readRows().withDataSourceConfiguration(config).withQuery(query))
+				.apply(MapElements.into(TypeDescriptor.of(Parcel.class))
+						.via(row -> RowParcelMapper.INSTANCE.logRowToParcel(row)));
+	}
 
-		return rows.apply("Row to Parcel", MapElements.into(TypeDescriptor.of(Parcel.class)).via(row -> RowParcelMapper.INSTANCE.rowToParcel(row)));
+	public PCollection<Parcel> findOpenParcelsRaw(Pipeline pipeline) {
+		String query = "SELECT * FROM parcel";
+
+		return pipeline.apply("Read Open Parcels",
+				JdbcIO.<Parcel>read().withDataSourceConfiguration(config).withQuery(query)
+						.withRowMapper(rs -> new Parcel(rs.getInt("id"), rs.getInt("user_id"),
+								rs.getBigDecimal("amount"), rs.getDate("due_date").toLocalDate())));
 	}
 
 	public void saveNewParcel(PCollection<Parcel> parcels) {
 
 		parcels.apply("Write Parcels",
 				JdbcIO.<Parcel>write().withDataSourceConfiguration(config)
-					.withStatement("INSERT INTO parcel (id, user_id, amount, due_date) VALUES (?, ?, ?, ?)")
-					.withPreparedStatementSetter((parcel, stmt) -> {
-						stmt.setInt(1, parcel.getId());
-						stmt.setInt(2, parcel.getUserId());
-						stmt.setBigDecimal(3, parcel.getAmount());
-						stmt.setDate(4, java.sql.Date.valueOf(parcel.getDueDate()));
-					}));
+						.withStatement("INSERT INTO parcel (id, user_id, amount, due_date) VALUES (?, ?, ?, ?)")
+						.withPreparedStatementSetter((parcel, stmt) -> {
+							stmt.setInt(1, parcel.getId());
+							stmt.setInt(2, parcel.getUserId());
+							stmt.setBigDecimal(3, parcel.getAmount());
+							stmt.setDate(4, java.sql.Date.valueOf(parcel.getDueDate()));
+						}));
 
 	}
 

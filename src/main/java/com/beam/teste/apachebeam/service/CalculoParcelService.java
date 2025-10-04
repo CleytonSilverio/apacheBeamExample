@@ -13,6 +13,8 @@ public class CalculoParcelService extends DoFn<Parcel, Parcel> {
 
 	@ProcessElement
 	public void process(@Element Parcel parcel, OutputReceiver<Parcel> out) {
+		System.out.println("[Service] Recebido: " + parcel + " | hashCode: " + (parcel != null ? parcel.hashCode() : "null") + " | class: " + (parcel != null ? parcel.getClass() : "null"));
+		System.out.println(parcel.toString());
 		BigDecimal update = parcel.getAmount().multiply(BigDecimal.valueOf(1.1));
 
 		Parcel newParcel = new Parcel((parcel.getId() + 1), parcel.getUserId(), update,

@@ -25,7 +25,6 @@ import lombok.ToString;
 @DefaultSchema(JavaFieldSchema.class)
 public class Parcel implements Serializable{
 
-	private static final long serialVersionUID = 1L;
 	private int id;
 	private int userId;
 	private BigDecimal amount;
