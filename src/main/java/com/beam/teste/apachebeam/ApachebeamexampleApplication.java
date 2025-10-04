@@ -4,8 +4,8 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.jdbc.JdbcIO;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.SimpleFunction;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.TypeDescriptors;
 
 import com.beam.teste.apachebeam.model.Parcel;
 import com.beam.teste.apachebeam.repository.ClientRepository;
@@ -25,6 +25,15 @@ public class ApachebeamexampleApplication {
 
 		// 1) Lê parcelas
 		PCollection<Parcel> openParcels = repo.findOpenParcels(pipeline);
+		
+		openParcels.apply("log", MapElements.via(new SimpleFunction<Parcel, Parcel>() {
+			@Override
+			public Parcel apply(Parcel log) {
+				System.out.println("[Main] Parcel: " + log.toString() + " | hashCode: " + (log != null ? log.hashCode() : "null"));
+				return log;
+			}
+		}));
+		
 		// 3) Aplica cálculo 1
 		PCollection<Parcel> recalculated1 = applyCalculo(openParcels);
 

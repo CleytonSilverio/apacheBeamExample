@@ -5,12 +5,9 @@ import org.apache.beam.sdk.io.jdbc.JdbcIO;
 import org.apache.beam.sdk.io.jdbc.JdbcIO.DataSourceConfiguration;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.Row;
 import org.apache.beam.sdk.values.TypeDescriptor;
 
 import com.beam.teste.apachebeam.mapper.RowParcelMapper;
-import org.mapstruct.factory.Mappers;
-
 import com.beam.teste.apachebeam.model.Parcel;
 
 public class ClientRepository extends BeamJdbcRepository<Parcel> {
@@ -27,15 +24,6 @@ public class ClientRepository extends BeamJdbcRepository<Parcel> {
 				.apply("Read Open Parcels", JdbcIO.readRows().withDataSourceConfiguration(config).withQuery(query))
 				.apply(MapElements.into(TypeDescriptor.of(Parcel.class))
 						.via(row -> RowParcelMapper.INSTANCE.logRowToParcel(row)));
-	}
-
-	public PCollection<Parcel> findOpenParcelsRaw(Pipeline pipeline) {
-		String query = "SELECT * FROM parcel";
-
-		return pipeline.apply("Read Open Parcels",
-				JdbcIO.<Parcel>read().withDataSourceConfiguration(config).withQuery(query)
-						.withRowMapper(rs -> new Parcel(rs.getInt("id"), rs.getInt("user_id"),
-								rs.getBigDecimal("amount"), rs.getDate("due_date").toLocalDate())));
 	}
 
 	public void saveNewParcel(PCollection<Parcel> parcels) {

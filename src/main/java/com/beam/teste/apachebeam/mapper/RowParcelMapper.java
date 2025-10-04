@@ -1,6 +1,7 @@
 package com.beam.teste.apachebeam.mapper;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 
 import org.apache.beam.sdk.values.Row;
@@ -20,11 +21,11 @@ public interface RowParcelMapper {
     @Mapping(target = "amount", expression = "java(getBigDecimal(row, \"amount\"))")
     @Mapping(target = "dueDate", expression = "java(getLocalDate(row, \"due_date\"))")
     public abstract Parcel rowToParcel(Row row);
-
+    
     default Parcel logRowToParcel(Row row) {
         Parcel parcel = rowToParcel(row);
         System.out.println("[RowParcelMapper] Row: " + row);
-        System.out.println("[RowParcelMapper] Parcel criado: " + parcel);
+        System.out.println("[RowParcelMapper] Parcel criado: " + parcel + " | hashCode: " + (parcel != null ? parcel.hashCode() : "null"));
         return parcel;
     }
 
