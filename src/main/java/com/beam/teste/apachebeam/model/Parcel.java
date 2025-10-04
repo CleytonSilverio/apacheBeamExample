@@ -8,8 +8,10 @@ import org.apache.beam.sdk.schemas.JavaFieldSchema;
 import org.apache.beam.sdk.schemas.annotations.DefaultSchema;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -18,6 +20,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 @DefaultSchema(JavaFieldSchema.class)
 public class Parcel implements Serializable{
 
@@ -26,7 +30,4 @@ public class Parcel implements Serializable{
 	private int userId;
 	private BigDecimal amount;
 	private LocalDate dueDate;
-	
-	public Parcel() {
-	}
 }

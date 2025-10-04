@@ -36,20 +36,8 @@ public class ApachebeamexampleApplication {
 		PCollection<Parcel> recalculated1 = applyCalculo(openParcels);
 
 		// 4) Salva no banco
-		String insertSql = "INSERT INTO parcel (id, user_id, amount, due_date) VALUES (?, ?, ?, ?)";
-//		repo.saveAll(recalculated1, insertSql, parcelSetter);
+		repo.saveNewParcel(recalculated1);
 		
-		recalculated1.apply("Save New Parcels",
-			    JdbcIO.<Parcel>write()
-			        .withDataSourceConfiguration(config)
-			        .withStatement("INSERT INTO parcel (id, user_id, amount, due_date) VALUES (?, ?, ?, ?)")
-			        .withPreparedStatementSetter((parcel, stmt) -> {
-			            stmt.setInt(1, parcel.getId());
-			            stmt.setInt(2, parcel.getUserId());
-			            stmt.setBigDecimal(3, parcel.getAmount());
-			            stmt.setDate(4, java.sql.Date.valueOf(parcel.getDueDate()));
-			        })
-			);
 
 		// 5) Você pode aplicar outros cálculos diferentes
 //		PCollection<Parcel> recalculated2 = applyOutroCalculo(openParcels);
